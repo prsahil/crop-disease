@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Smart Agri Assistant</title>
+</head>
+<body>
+    <h1>Smart Agri Assistant</h1>
+    
+    <!-- Crop Disease Detection -->
+    <h2>Upload Crop Image</h2>
+    <input type="file" id="cropImage">
+    <button onclick="detectDisease()">Detect Disease</button>
+    <p id="diseaseResult"></p>
+
+    <!-- Smart Irrigation -->
+    <h2>Enter Environment Data</h2>
+    <input type="text" id="temperature" placeholder="Temperature">
+    <input type="text" id="humidity" placeholder="Humidity">
+    <input type="text" id="soilMoisture" placeholder="Soil Moisture">
+    <button onclick="predictIrrigation()">Get Irrigation Time</button>
+    <p id="irrigationResult"></p>
+
+    <script>
+        function detectDisease() {
+            let fileInput = document.getElementById("cropImage").files[0];
+            let formData = new FormData();
+            formData.append("image", fileInput);
+
+            fetch("/detect-disease/", { method: "POST", body: formData })
+                .then(response => response.json())
+                .then(data => document.getElementById("diseaseResult").innerText = `Disease: ${data.disease}, Suggestion: ${data.suggestion}`);
+        }
+
+        function predictIrrigation() {
+            let temp = document.getElementById("temperature").value;
+            let humidity = document.getElementById("humidity").value;
+            let soilMoisture = document.getElementById("soilMoisture").value;
+
+            fetch("/predict-irrigation/", {
+                method: "POST",
+                body: new URLSearchParams({ temperature: temp, humidity: humidity, soil_moisture: soilMoisture })
+            })
+            .then(response => response.json())
+            .then(data => document.getElementById("irrigationResult").innerText = `Recommended Irrigation Time: ${data.irrigation_time} minutes`);
+        }
+    </script>
+</body>
+</html>
